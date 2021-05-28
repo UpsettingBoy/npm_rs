@@ -1,0 +1,10 @@
+[package]
+authors = ["Jerónimo Sánches <jeronimosg@hotmail.es>"]
+edition = "2018"
+name    = "npm_rs"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cfg-if = "1.0.0"
