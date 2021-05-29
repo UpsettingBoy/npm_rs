@@ -1,3 +1,20 @@
+//! This crate provides an abstraction over [`Command`] with manual `npm` commands
+//! in a simple and easy package with fluent API.
+//!
+//! `npm_rs` exposes [NpmEnv] to configure the npm execution enviroment and
+//! [Npm] to use said enviroment to execute npm commands.
+//!
+//! # Example
+//! ```
+//! let exit_status = NpmEnv::default()
+//!        .with_env("NODE_ENV")
+//!        .init()
+//!        .install(None)
+//!        .custom("audit")
+//!        .run("build")
+//!        .exec()?;
+//! ```
+
 use std::{
     ffi::OsStr,
     path::Path,
@@ -20,14 +37,24 @@ const NPM: &str = "npm";
 const NPM_INSTALL: &str = "install";
 const NPM_RUN: &str = "run";
 
-pub struct NpmEnvCfg(Command);
+/// This struct is used to create the enviroment in which npm will execute commands.
+/// `NpmEnv` uses [`Command`] so it takes all the env variables in your system.
+///
+/// After the environment is configured, use [`NpmEnv::init()`] to start issuing commands to [`Npm`].
+/// # Example
+/// ```
+/// let npm = NpmEnv::default()
+///                  .with_env("NODE_ENV", "production")
+///                  .init();
+/// ```
+pub struct NpmEnv(Command);
 
 pub struct Npm {
     cmd: Command,
     args: Vec<String>,
 }
 
-impl Default for NpmEnvCfg {
+impl Default for NpmEnv {
     fn default() -> Self {
         let mut cmd = Command::new(CMD);
         cmd.arg(OPT);
@@ -37,15 +64,18 @@ impl Default for NpmEnvCfg {
     }
 }
 
-impl NpmEnvCfg {
-    pub fn with_env<S>(mut self, key: S, val: S) -> Self
+impl NpmEnv {
+    /// Inserts or updates a enviroment variable mapping.
+    pub fn with_env<K, V>(mut self, key: K, val: V) -> Self
     where
-        S: AsRef<OsStr>,
+        K: AsRef<OsStr>,
+        V: AsRef<OsStr>,
     {
         self.0.env(key, val);
         self
     }
 
+    /// Inserts or updates multiple environment variable mappings.
     pub fn with_envs<I, K, V>(mut self, vars: I) -> Self
     where
         I: IntoIterator<Item = (K, V)>,
@@ -56,11 +86,13 @@ impl NpmEnvCfg {
         self
     }
 
+    /// Clears the entire environment map for [`Npm`].
     pub fn clear_envs(mut self) -> Self {
         self.0.env_clear();
         self
     }
 
+    /// Removes an enviroment variable mapping.
     pub fn remove_env<K>(mut self, key: K) -> Self
     where
         K: AsRef<OsStr>,
@@ -69,15 +101,19 @@ impl NpmEnvCfg {
         self
     }
 
-    pub fn set_path<S>(mut self, path: S) -> Self
+    /// Sets the working directory for [`Npm`].
+    pub fn set_path<P>(mut self, path: P) -> Self
     where
-        S: AsRef<Path>,
+        P: AsRef<Path>,
     {
         self.0.current_dir(path);
         self
     }
 
-    pub fn configure(self) -> Npm {
+    /// Initilizes [`Npm`] with the configured environment.
+    ///
+    /// This method will be `NpmEnv::init(&self)` when [`Command`] derives [`Clone`].
+    pub fn init(self) -> Npm {
         Npm {
             cmd: self.0,
             args: Default::default(),
@@ -87,16 +123,19 @@ impl NpmEnvCfg {
 
 impl Default for Npm {
     fn default() -> Self {
-        NpmEnvCfg::default().configure()
+        NpmEnv::default().init()
     }
 }
 
 impl Npm {
-    pub fn install(mut self, packages: Option<&[&str]>) -> Self {
+    /// Same behaviour as [npm-install](https://docs.npmjs.com/cli/v7/commands/npm-install).
+    /// - If `args =`[`None`]: Installs all the dependencies listed in `package.json` into the local `node_modules` folder.
+    /// - If `args =`[`Some`]: Installs any package in `args` into the local `node_modules` folder.
+    pub fn install(mut self, args: Option<&[&str]>) -> Self {
         self.args.push(
             [NPM, NPM_INSTALL]
                 .iter()
-                .chain(packages.unwrap_or_default())
+                .chain(args.unwrap_or_default())
                 .copied()
                 .collect::<Vec<_>>()
                 .join(" "),
@@ -105,12 +144,24 @@ impl Npm {
         self
     }
 
-    pub fn run(mut self, runner: &str) -> Self {
-        self.args.push([NPM, NPM_RUN, runner].join(" "));
+    /// Same behaviour as [npm-run-script](https://docs.npmjs.com/cli/v7/commands/npm-run-script).
+    /// Runs an arbitrary `command` from `package.json`'s "scripts" object.
+    pub fn run(mut self, command: &str) -> Self {
+        self.args.push([NPM, NPM_RUN, command].join(" "));
 
         self
     }
 
+    /// Runs a custom npm command.
+    ///
+    /// # Arguments
+    /// - `command`: command to execute.
+    /// - `args`: arguments of `command`.
+    ///
+    /// # Example
+    /// ```
+    /// Npm::default().custom("audit", None).exec()?; // Equivalent to `npm audit`.
+    /// ```
     pub fn custom(mut self, command: &str, args: Option<&[&str]>) -> Self {
         self.args.push(
             [NPM, command]
@@ -124,6 +175,13 @@ impl Npm {
         self
     }
 
+    /// Executes all the commands in the invokation order used, waiting for its completion status.
+    ///
+    /// # Example
+    /// ```
+    /// let status = Npm::default().install(None).run("build").exec()?; // Executes npm install && npm run build.
+    /// assert!(status.success()); // Will `panic` if not completed successfully.
+    /// ```
     pub fn exec(mut self) -> Result<ExitStatus, std::io::Error> {
         self.cmd.arg(self.args.join(" && "));
         dbg!(&self.cmd);
