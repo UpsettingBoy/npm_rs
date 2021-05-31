@@ -7,10 +7,9 @@
 //! # Example
 //! ```
 //! let exit_status = NpmEnv::default()
-//!        .with_env("NODE_ENV")
+//!        .with_env("NODE_ENV", "production")
 //!        .init()
 //!        .install(None)
-//!        .custom("audit")
 //!        .run("build")
 //!        .exec()?;
 //! ```
@@ -49,6 +48,14 @@ const NPM_RUN: &str = "run";
 /// ```
 pub struct NpmEnv(Command);
 
+/// This struct is used to execute npm commands.
+/// Can be created from [`NpmEnv`] of using [`Default`].
+///
+/// After queuing the desired commands, use [`Npm::exec()`] to execute them.
+/// # Example
+/// ```
+/// Npm::default().install(&["tailwindcss"]).exec()?
+/// ```
 pub struct Npm {
     cmd: Command,
     args: Vec<String>,
@@ -140,7 +147,6 @@ impl Npm {
                 .collect::<Vec<_>>()
                 .join(" "),
         );
-
         self
     }
 
@@ -148,7 +154,6 @@ impl Npm {
     /// Runs an arbitrary `command` from `package.json`'s "scripts" object.
     pub fn run(mut self, command: &str) -> Self {
         self.args.push([NPM, NPM_RUN, command].join(" "));
-
         self
     }
 
@@ -171,7 +176,6 @@ impl Npm {
                 .collect::<Vec<_>>()
                 .join(" "),
         );
-
         self
     }
 
@@ -184,8 +188,6 @@ impl Npm {
     /// ```
     pub fn exec(mut self) -> Result<ExitStatus, std::io::Error> {
         self.cmd.arg(self.args.join(" && "));
-        dbg!(&self.cmd);
-
         self.cmd.status()
     }
 }

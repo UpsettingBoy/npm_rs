@@ -1,10 +1,15 @@
 [package]
-authors = ["Jerónimo Sánchez <jeronimosg@hotmail.es>"]
-edition = "2018"
-name    = "npm_rs"
-version = "0.1.0"
+authors     = ["Jerónimo Sánchez <jeronimosg@hotmail.es>"]
+categories  = ["web-programming", "development-tools::build-utils"]
+description = "Provides simple Rust to npm bindings to use in your build scripts."
+edition     = "2018"
+homepage    = "https://github.com/UpsettingBoy/npm_rs"
+keywords    = ["npm", "web", "build-dependencies"]
+license     = "MIT OR Apache-2.0"
+name        = "npm_rs"
+repository  = "https://github.com/UpsettingBoy/npm_rs"
+version     = "0.1.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 cfg-if = "1.0.0"
