@@ -33,6 +33,7 @@ cfg_if! {
 }
 
 const NPM: &str = "npm";
+const NPM_INIT: &str = "init";
 const NPM_INSTALL: &str = "install";
 const NPM_UNINSTALL: &str = "uninstall";
 const NPM_UPDATE: &str = "update";
@@ -146,6 +147,13 @@ impl Npm {
                 .collect::<Vec<_>>()
                 .join(" "),
         );
+    }
+
+    /// Same behaviour as [npm-init -y](https://docs.npmjs.com/cli/v7/commands/npm-init#yes).
+    /// Initializes a package, creating a `package.json` file with the default template.
+    pub fn init(mut self) -> Self {
+        self.npm_append(NPM_INIT, &["-y"]);
+        self
     }
 
     /// Same behaviour as [npm-install](https://docs.npmjs.com/cli/v7/commands/npm-install).
