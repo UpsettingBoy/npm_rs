@@ -35,6 +35,7 @@ cfg_if! {
 const NPM: &str = "npm";
 const NPM_INSTALL: &str = "install";
 const NPM_UNINSTALL: &str = "uninstall";
+const NPM_UPDATE: &str = "update";
 const NPM_RUN: &str = "run";
 
 /// This struct is used to create the enviroment in which npm will execute commands.
@@ -159,6 +160,14 @@ impl Npm {
     /// Uninstalls the given packages in `pkg`.
     pub fn uninstall(mut self, pkg: &[&str]) -> Self {
         self.npm_append(NPM_UNINSTALL, pkg);
+        self
+    }
+
+    /// Same behaviour as [npm-update](https://docs.npmjs.com/cli/v7/commands/npm-update).
+    /// - If `args =`[`None`]: Updates all the local dependencies (local `node_modules` folder).
+    /// - If `args =`[`Some`]: Updates any package in `pkg`.
+    pub fn update(mut self, pkg: Option<&[&str]>) -> Self {
+        self.npm_append(NPM_UPDATE, pkg.unwrap_or_default());
         self
     }
 
