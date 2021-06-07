@@ -136,32 +136,29 @@ impl Default for Npm {
 }
 
 impl Npm {
-    /// Same behaviour as [npm-install](https://docs.npmjs.com/cli/v7/commands/npm-install).
-    /// - If `args =`[`None`]: Installs all the dependencies listed in `package.json` into the local `node_modules` folder.
-    /// - If `args =`[`Some`]: Installs any package in `args` into the local `node_modules` folder.
-    pub fn install(mut self, args: Option<&[&str]>) -> Self {
+    fn npm_append(&mut self, npm_cmd: &str, chain: &[&str]) {
         self.args.push(
-            [NPM, NPM_INSTALL]
+            [NPM, npm_cmd]
                 .iter()
-                .chain(args.unwrap_or_default())
+                .chain(chain)
                 .copied()
                 .collect::<Vec<_>>()
                 .join(" "),
         );
+    }
+
+    /// Same behaviour as [npm-install](https://docs.npmjs.com/cli/v7/commands/npm-install).
+    /// - If `args =`[`None`]: Installs all the dependencies listed in `package.json` into the local `node_modules` folder.
+    /// - If `args =`[`Some`]: Installs any package in `args` into the local `node_modules` folder.
+    pub fn install(mut self, args: Option<&[&str]>) -> Self {
+        self.npm_append(NPM_INSTALL, args.unwrap_or_default());
         self
     }
 
     /// Same behaviour as [npm-uninstall](https://docs.npmjs.com/cli/v7/commands/npm-uninstall).
     /// Uninstalls the given packages in `pkg`.
     pub fn uninstall(mut self, pkg: &[&str]) -> Self {
-        self.args.push(
-            [NPM, NPM_UNINSTALL]
-                .iter()
-                .chain(pkg)
-                .copied()
-                .collect::<Vec<_>>()
-                .join(" "),
-        );
+        self.npm_append(NPM_UNINSTALL, pkg);
         self
     }
 
@@ -183,14 +180,7 @@ impl Npm {
     /// Npm::default().custom("audit", None).exec()?; // Equivalent to `npm audit`.
     /// ```
     pub fn custom(mut self, command: &str, args: Option<&[&str]>) -> Self {
-        self.args.push(
-            [NPM, command]
-                .iter()
-                .chain(args.unwrap_or_default())
-                .copied()
-                .collect::<Vec<_>>()
-                .join(" "),
-        );
+        self.npm_append(command, args.unwrap_or_default());
         self
     }
 
