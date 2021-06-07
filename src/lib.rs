@@ -34,6 +34,7 @@ cfg_if! {
 
 const NPM: &str = "npm";
 const NPM_INSTALL: &str = "install";
+const NPM_UNINSTALL: &str = "uninstall";
 const NPM_RUN: &str = "run";
 
 /// This struct is used to create the enviroment in which npm will execute commands.
@@ -143,6 +144,20 @@ impl Npm {
             [NPM, NPM_INSTALL]
                 .iter()
                 .chain(args.unwrap_or_default())
+                .copied()
+                .collect::<Vec<_>>()
+                .join(" "),
+        );
+        self
+    }
+
+    /// Same behaviour as [npm-uninstall](https://docs.npmjs.com/cli/v7/commands/npm-uninstall).
+    /// Uninstalls the given packages in `pkg`.
+    pub fn uninstall(mut self, pkg: &[&str]) -> Self {
+        self.args.push(
+            [NPM, NPM_UNINSTALL]
+                .iter()
+                .chain(pkg)
                 .copied()
                 .collect::<Vec<_>>()
                 .join(" "),
