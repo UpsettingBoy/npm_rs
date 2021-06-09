@@ -14,6 +14,7 @@
 //!        .exec()?;
 //! ```
 
+#[cfg_attr(feature = "nightly", feature(command_access))]
 use std::{
     ffi::OsStr,
     path::Path,
@@ -69,6 +70,17 @@ impl Default for NpmEnv {
         let mut cmd = Command::new(CMD);
         cmd.arg(OPT);
         cmd.current_dir(std::env::current_dir().unwrap());
+
+        Self(cmd)
+    }
+}
+
+#[cfg(feature = "nightly")]
+impl Clone for NpmEnv {
+    fn clone(&self) -> Self {
+        let mut cmd = Command::new(self.0.get_program());
+        cmd.args(self.0.get_args());
+        cmd.current_dir(self.0.get_current_dir().unwrap());
 
         Self(cmd)
     }
