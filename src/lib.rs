@@ -13,6 +13,15 @@
 //!        .run("build")
 //!        .exec()?;
 //! ```
+//!
+//! [NpmEnv] implements [`Clone`] while running under a nightly toolchain
+//! and with the feature `nightly` is enabled.
+//! ```
+//! // Cargo.toml
+//!
+//! [dev.dependencies]
+//! npm_rs = { version = "0.1", features = ["nightly"] }
+//! ```
 
 #![cfg_attr(feature = "nightly", feature(command_access))]
 use std::{

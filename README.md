@@ -23,6 +23,15 @@ fn main() -> Result<(), Box<dyn std::error:Error>>{
 }
 ```
 
+## Features
+`NpmEnv` can be clone when the feature `nightly` is enabled. This only works under a nightly toolchain.
+```toml
+// Cargo.toml
+
+[dev.dependencies]
+npm_rs = { version = "0.1", features = ["nightly"] }
+```
+
 ## Stability
 Since this is a small library, I would like it to have all the needed features and to be usable before commiting to a **v1.0.0**.
 
