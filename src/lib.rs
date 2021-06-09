@@ -14,6 +14,7 @@
 //!        .install(None)
 //!        .run("build")
 //!        .exec()?;
+//! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 //!
 //! [NpmEnv] implements [`Clone`] while running under a nightly toolchain
@@ -57,6 +58,8 @@ const NPM_RUN: &str = "run";
 /// After the environment is configured, use [`NpmEnv::init()`] to start issuing commands to [`Npm`].
 /// # Example
 /// ```no_run
+/// use npm_rs::*;
+///
 /// let npm = NpmEnv::default()
 ///                  .with_env("NODE_ENV", "production")
 ///                  .init();
@@ -71,7 +74,8 @@ pub struct NpmEnv(Command);
 /// ```no_run
 /// use npm_rs::*;
 ///
-/// Npm::default().install(&["tailwindcss"]).exec()?;
+/// Npm::default().install(Some(&["tailwindcss"])).exec()?;
+/// # Ok::<(), Box<dyn std::error::Error>>(())
 /// ```
 pub struct Npm {
     cmd: Command,
@@ -222,6 +226,7 @@ impl Npm {
     /// use npm_rs::*;
     ///
     /// Npm::default().custom("audit", None).exec()?; // Equivalent to `npm audit`.
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
     pub fn custom(mut self, command: &str, args: Option<&[&str]>) -> Self {
         self.npm_append(command, args.unwrap_or_default());
@@ -236,6 +241,7 @@ impl Npm {
     ///
     /// let status = Npm::default().install(None).run("build").exec()?; // Executes npm install && npm run build.
     /// assert!(status.success()); // Will `panic` if not completed successfully.
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
     pub fn exec(mut self) -> Result<ExitStatus, std::io::Error> {
         self.cmd.arg(self.args.join(" && "));
