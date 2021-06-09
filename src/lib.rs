@@ -14,7 +14,7 @@
 //!        .exec()?;
 //! ```
 
-#[cfg_attr(feature = "nightly", feature(command_access))]
+#![cfg_attr(feature = "nightly", feature(command_access))]
 use std::{
     ffi::OsStr,
     path::Path,
