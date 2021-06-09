@@ -5,7 +5,7 @@
 //! [Npm] to use said enviroment to execute npm commands.
 //!
 //! # Example
-//! ```
+//! ```no_run
 //! let exit_status = NpmEnv::default()
 //!        .with_env("NODE_ENV", "production")
 //!        .init()
@@ -16,7 +16,7 @@
 //!
 //! [NpmEnv] implements [`Clone`] while running under a nightly toolchain
 //! and with the feature `nightly` is enabled.
-//! ```
+//! ```no_check
 //! // Cargo.toml
 //!
 //! [dev.dependencies]
@@ -54,7 +54,7 @@ const NPM_RUN: &str = "run";
 ///
 /// After the environment is configured, use [`NpmEnv::init()`] to start issuing commands to [`Npm`].
 /// # Example
-/// ```
+/// ```no_run
 /// let npm = NpmEnv::default()
 ///                  .with_env("NODE_ENV", "production")
 ///                  .init();
@@ -66,8 +66,8 @@ pub struct NpmEnv(Command);
 ///
 /// After queuing the desired commands, use [`Npm::exec()`] to execute them.
 /// # Example
-/// ```
-/// Npm::default().install(&["tailwindcss"]).exec()?
+/// ```no_run
+/// Npm::default().install(&["tailwindcss"]).exec()?;
 /// ```
 pub struct Npm {
     cmd: Command,
@@ -214,7 +214,7 @@ impl Npm {
     /// - `args`: arguments of `command`.
     ///
     /// # Example
-    /// ```
+    /// ```no_run
     /// Npm::default().custom("audit", None).exec()?; // Equivalent to `npm audit`.
     /// ```
     pub fn custom(mut self, command: &str, args: Option<&[&str]>) -> Self {
@@ -225,7 +225,7 @@ impl Npm {
     /// Executes all the commands in the invokation order used, waiting for its completion status.
     ///
     /// # Example
-    /// ```
+    /// ```no_run
     /// let status = Npm::default().install(None).run("build").exec()?; // Executes npm install && npm run build.
     /// assert!(status.success()); // Will `panic` if not completed successfully.
     /// ```
