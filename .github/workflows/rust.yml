@@ -33,6 +33,29 @@ jobs:
         command: test
         args: --release --verbose
 
+  stable-aarch64-unknown-linux-gnu:
+    runs-on: ubuntu-latest
+    name: stable-aarch64-unknown-linux-gnu
+    steps:
+    - name: Repo checkout
+      uses: actions/checkout@v2
+    - name: Toolchain setup
+      uses: actions-rs/toolchain@v1
+      with:
+        target: aarch64-unknown-linux-gnu
+        toolchain: stable
+        override: true
+    - name: Build release
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --verbose
+    - name: Test release
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --release --verbose
+
   stable-x86_64-pc-windows-msvc:
     runs-on: windows-latest
     name: stable-x86_64-pc-windows-msvc
@@ -89,6 +112,29 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         target: x86_64-unknown-linux-gnu
+        toolchain: nightly
+        override: true
+    - name: Build release
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --verbose
+    - name: Test release
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --release --verbose
+
+  nightly-aarch64-unknown-linux-gnu:
+    runs-on: ubuntu-latest
+    name: nightly-aarch64-unknown-linux-gnu
+    steps:
+    - name: Repo checkout
+      uses: actions/checkout@v2
+    - name: Toolchain setup
+      uses: actions-rs/toolchain@v1
+      with:
+        target: aarch64-unknown-linux-gnu
         toolchain: nightly
         override: true
     - name: Build release
