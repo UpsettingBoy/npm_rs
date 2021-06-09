@@ -6,6 +6,8 @@
 //!
 //! # Example
 //! ```no_run
+//! use npm_rs::*;
+//!
 //! let exit_status = NpmEnv::default()
 //!        .with_env("NODE_ENV", "production")
 //!        .init()
@@ -16,7 +18,7 @@
 //!
 //! [NpmEnv] implements [`Clone`] while running under a nightly toolchain
 //! and with the feature `nightly` is enabled.
-//! ```no_check
+//! ```ignore
 //! // Cargo.toml
 //!
 //! [dev.dependencies]
@@ -67,6 +69,8 @@ pub struct NpmEnv(Command);
 /// After queuing the desired commands, use [`Npm::exec()`] to execute them.
 /// # Example
 /// ```no_run
+/// use npm_rs::*;
+///
 /// Npm::default().install(&["tailwindcss"]).exec()?;
 /// ```
 pub struct Npm {
@@ -215,6 +219,8 @@ impl Npm {
     ///
     /// # Example
     /// ```no_run
+    /// use npm_rs::*;
+    ///
     /// Npm::default().custom("audit", None).exec()?; // Equivalent to `npm audit`.
     /// ```
     pub fn custom(mut self, command: &str, args: Option<&[&str]>) -> Self {
@@ -226,6 +232,8 @@ impl Npm {
     ///
     /// # Example
     /// ```no_run
+    /// use npm_rs::*;
+    ///
     /// let status = Npm::default().install(None).run("build").exec()?; // Executes npm install && npm run build.
     /// assert!(status.success()); // Will `panic` if not completed successfully.
     /// ```
