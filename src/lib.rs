@@ -17,14 +17,8 @@
 //! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 //!
-//! [NpmEnv] implements [`Clone`] while running under a nightly toolchain
-//! and with the feature `nightly` is enabled.
-//! ```ignore
-//! // Cargo.toml
-//!
-//! [dev.dependencies]
-//! npm_rs = { version = "0.1", features = ["nightly"] }
-//! ```
+//! [NpmEnv] implements [`Clone`] while under a nightly toolchain
+//! when feature `nightly` is enabled.
 
 #![cfg_attr(feature = "nightly", feature(command_access))]
 use std::{

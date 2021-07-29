@@ -4,8 +4,8 @@ A library to run npm commands from your Rust build script.
 
 [Documentation](https://docs.rs/npm_rs)
 
-This library will aid you in executing npm commands when building your crate/bin,
-removing the burden on having to manually do so.
+This library will aid you in executing **npm** commands when building your crate/bin,
+removing the burden on having to manually do so or by using a tool other than **Cargo**.
 
 ## Using npm_rs
 ```rust
@@ -24,12 +24,12 @@ fn main() -> Result<(), Box<dyn std::error:Error>>{
 ```
 
 ## Features
-`NpmEnv` can be clone when the feature `nightly` is enabled. This only works under a nightly toolchain.
+`NpmEnv` can be `Clone` when the feature `nightly` is enabled. This only works under a nightly toolchain.
 ```toml
-// Cargo.toml
+# Cargo.toml
 
-[dev.dependencies]
-npm_rs = { version = "0.1", features = ["nightly"] }
+[build.dependencies]
+npm_rs = { version = "*", features = ["nightly"] }
 ```
 
 ## Stability
