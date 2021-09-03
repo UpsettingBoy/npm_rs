@@ -39,12 +39,20 @@ cfg_if! {
     }
 }
 
+const NODE_ENV: &str = "NODE_ENV";
+
 const NPM: &str = "npm";
 const NPM_INIT: &str = "init";
 const NPM_INSTALL: &str = "install";
 const NPM_UNINSTALL: &str = "uninstall";
 const NPM_UPDATE: &str = "update";
 const NPM_RUN: &str = "run";
+
+pub enum NodeEnv {
+    Development,
+    Production,
+    Custom(String),
+}
 
 /// This struct is used to create the enviroment in which npm will execute commands.
 /// `NpmEnv` uses [`Command`] so it takes all the env variables in your system.
@@ -76,6 +84,22 @@ pub struct Npm {
     args: Vec<String>,
 }
 
+impl Default for NodeEnv {
+    fn default() -> Self {
+        NodeEnv::Development
+    }
+}
+
+impl NodeEnv {
+    pub fn from_cargo() -> Result<Self, std::env::VarError> {
+        Ok(match &std::env::var("PROFILE")?[..] {
+            "debug" => Self::Development,
+            "release" => Self::Production,
+            x => Self::Custom(x.to_string()),
+        })
+    }
+}
+
 impl Default for NpmEnv {
     fn default() -> Self {
         let mut cmd = Command::new(CMD);
@@ -98,6 +122,16 @@ impl Clone for NpmEnv {
 }
 
 impl NpmEnv {
+    pub fn with_node_env(self, node_env: &NodeEnv) -> Self {
+        let env = match node_env {
+            NodeEnv::Development => "development",
+            NodeEnv::Production => "production",
+            NodeEnv::Custom(c) => &c,
+        };
+
+        self.with_env(NODE_ENV, env)
+    }
+
     /// Inserts or updates a enviroment variable mapping.
     pub fn with_env<K, V>(mut self, key: K, val: V) -> Self
     where
