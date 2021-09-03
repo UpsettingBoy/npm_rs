@@ -14,7 +14,7 @@ removing the burden on having to manually do so or by using a tool other than **
 fn main() -> Result<(), Box<dyn std::error:Error>>{
     npm_rs::NpmEnv::default()
                    .with_env("NODE_ENV", "production")
-                   .init()
+                   .init_env()
                    .install(None)
                    .run("build")
                    .exec()?;

@@ -10,7 +10,7 @@
 //!
 //! let exit_status = NpmEnv::default()
 //!        .with_env("NODE_ENV", "production")
-//!        .init()
+//!        .init_env()
 //!        .install(None)
 //!        .run("build")
 //!        .exec()?;
@@ -56,7 +56,7 @@ const NPM_RUN: &str = "run";
 ///
 /// let npm = NpmEnv::default()
 ///                  .with_env("NODE_ENV", "production")
-///                  .init();
+///                  .init_env();
 /// ```
 pub struct NpmEnv(Command);
 
@@ -145,8 +145,9 @@ impl NpmEnv {
 
     /// Initilizes [`Npm`] with the configured environment.
     ///
-    /// This method will be `NpmEnv::init(&self)` when [`Command`] derives [`Clone`].
-    pub fn init(self) -> Npm {
+    /// This method will be `NpmEnv::init_env(&self)` when [`Command`] derives [`Clone`].
+    /// For now, use `features = ["nightly"]` to clone the enviroment configuration.
+    pub fn init_env(self) -> Npm {
         Npm {
             cmd: self.0,
             args: Default::default(),
@@ -156,7 +157,7 @@ impl NpmEnv {
 
 impl Default for Npm {
     fn default() -> Self {
-        NpmEnv::default().init()
+        NpmEnv::default().init_env()
     }
 }
 
