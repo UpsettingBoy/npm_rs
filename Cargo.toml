@@ -8,7 +8,7 @@ keywords    = ["npm", "web", "build-dependencies"]
 license     = "MIT OR Apache-2.0"
 name        = "npm_rs"
 repository  = "https://github.com/UpsettingBoy/npm_rs"
-version     = "0.1.2"
+version     = "0.2.0"
 
 
 [dependencies]
