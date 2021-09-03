@@ -1,15 +1,17 @@
-//! This crate provides an abstraction over [`Command`] with manual `npm` commands
+//! This crate provides an abstraction over [`Command`] to use `npm`
 //! in a simple and easy package with fluent API.
 //!
-//! `npm_rs` exposes [NpmEnv] to configure the npm execution enviroment and
-//! [Npm] to use said enviroment to execute npm commands.
+//! `npm_rs` exposes [`NpmEnv`] to configure the `npm` execution enviroment and
+//! [`Npm`] to use said enviroment to execute `npm` commands.
 //!
-//! # Example
+//! # Examples
+//! ## Manual `NODE_ENV` setup
 //! ```no_run
 //! use npm_rs::*;
 //!
 //! let exit_status = NpmEnv::default()
-//!        .with_env("NODE_ENV", "production")
+//!        .with_node_env(&NodeEnv::Production)
+//!        .with_env("FOO", "bar")
 //!        .init_env()
 //!        .install(None)
 //!        .run("build")
@@ -17,7 +19,21 @@
 //! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 //!
-//! [NpmEnv] implements [`Clone`] while under a nightly toolchain
+//! ## Automatic `NODE_ENV` setup
+//! ```no_run
+//! use npm_rs::*;
+//!
+//! let exit_status = NpmEnv::default()
+//!        .with_node_env(&NodeEnv::from_cargo_profile().unwrap_or_default())
+//!        .with_env("FOO", "bar")
+//!        .init_env()
+//!        .install(None)
+//!        .run("build")
+//!        .exec()?;
+//! # Ok::<(), Box<dyn std::error::Error>>(())
+//! ```
+//!
+//! [`NpmEnv`] implements [`Clone`] while under a nightly toolchain
 //! when feature `nightly` is enabled.
 
 #![cfg_attr(feature = "nightly", feature(command_access))]
@@ -48,6 +64,9 @@ const NPM_UNINSTALL: &str = "uninstall";
 const NPM_UPDATE: &str = "update";
 const NPM_RUN: &str = "run";
 
+/// This enum is used to determine the desired `NODE_ENV` variable value. Its value by [`Default`] is [`NodeEnv::Development`]
+///
+/// Can be retrieved from Cargo env var `PROFILE` using [`NodeEnv::from_cargo()`](NodeEnv::from_cargo) or created manually.
 pub enum NodeEnv {
     Development,
     Production,
@@ -55,15 +74,16 @@ pub enum NodeEnv {
 }
 
 /// This struct is used to create the enviroment in which npm will execute commands.
-/// `NpmEnv` uses [`Command`] so it takes all the env variables in your system.
+/// [`NpmEnv`] uses [`Command`] so it takes all the env variables in your system.
 ///
-/// After the environment is configured, use [`NpmEnv::init()`] to start issuing commands to [`Npm`].
+/// After the environment is configured, use [`NpmEnv::init_env()`](NpmEnv::init_env) to start issuing commands to [`Npm`].
 /// # Example
 /// ```no_run
 /// use npm_rs::*;
 ///
 /// let npm = NpmEnv::default()
-///                  .with_env("NODE_ENV", "production")
+///                  .with_node_env(&NodeEnv::Production)
+///                  .with_env("FOO", "bar")
 ///                  .init_env();
 /// ```
 pub struct NpmEnv(Command);
@@ -91,7 +111,13 @@ impl Default for NodeEnv {
 }
 
 impl NodeEnv {
-    pub fn from_cargo() -> Result<Self, std::env::VarError> {
+    /// Creates a [`NodeEnv`] enum from the Cargo `PROFILE` enviroment variable as follows:
+    /// - If `PROFILE` = `debug` then [`NodeEnv::Development`].
+    /// - If `PROFILE` = `release` then [`NodeEnv::Production`].
+    /// - Else [`NodeEnv::Custom(String)`] with the value of `PROFILE`.
+    ///
+    /// This function is roughly equivalent to `NpmEnv::with_env("NODE_ENV", PROFILE)`.
+    pub fn from_cargo_profile() -> Result<Self, std::env::VarError> {
         Ok(match &std::env::var("PROFILE")?[..] {
             "debug" => Self::Development,
             "release" => Self::Production,
@@ -122,6 +148,7 @@ impl Clone for NpmEnv {
 }
 
 impl NpmEnv {
+    /// Inserts or updates the `NODE_ENV` envoriment variable.
     pub fn with_node_env(self, node_env: &NodeEnv) -> Self {
         let env = match node_env {
             NodeEnv::Development => "development",
