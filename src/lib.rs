@@ -7,6 +7,8 @@
 //! # Examples
 //! ## Manual `NODE_ENV` setup
 //! ```no_run
+//! // build.rs
+//!
 //! use npm_rs::*;
 //!
 //! let exit_status = NpmEnv::default()
@@ -21,6 +23,8 @@
 //!
 //! ## Automatic `NODE_ENV` setup
 //! ```no_run
+//! // build.rs
+//!
 //! use npm_rs::*;
 //!
 //! let exit_status = NpmEnv::default()

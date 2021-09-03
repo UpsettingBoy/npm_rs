@@ -1,27 +1,55 @@
 # npm_rs
 
-A library to run npm commands from your Rust build script.
+A library to run `npm` commands from your Rust build script.
 
 [Documentation](https://docs.rs/npm_rs)
 
-This library will aid you in executing **npm** commands when building your crate/bin,
+This library will aid you in executing `npm` commands when building your crate/bin,
 removing the burden on having to manually do so or by using a tool other than **Cargo**.
 
-## Using npm_rs
+<!-- cargo-sync-readme start -->
+
+This crate provides an abstraction over [`Command`] to use `npm`
+in a simple and easy package with fluent API.
+
+`npm_rs` exposes [`NpmEnv`] to configure the `npm` execution enviroment and
+[`Npm`] to use said enviroment to execute `npm` commands.
+
+# Examples
+## Manual `NODE_ENV` setup
 ```rust
 // build.rs
 
-fn main() -> Result<(), Box<dyn std::error:Error>>{
-    npm_rs::NpmEnv::default()
-                   .with_env("NODE_ENV", "production")
-                   .init_env()
-                   .install(None)
-                   .run("build")
-                   .exec()?;
+use npm_rs::*;
 
-    Ok(())
-}
+let exit_status = NpmEnv::default()
+       .with_node_env(&NodeEnv::Production)
+       .with_env("FOO", "bar")
+       .init_env()
+       .install(None)
+       .run("build")
+       .exec()?;
 ```
+
+## Automatic `NODE_ENV` setup
+```rust
+// build.rs
+
+use npm_rs::*;
+
+let exit_status = NpmEnv::default()
+       .with_node_env(&NodeEnv::from_cargo_profile().unwrap_or_default())
+       .with_env("FOO", "bar")
+       .init_env()
+       .install(None)
+       .run("build")
+       .exec()?;
+```
+
+[`NpmEnv`] implements [`Clone`] while under a nightly toolchain
+when feature `nightly` is enabled.
+
+<!-- cargo-sync-readme end -->
 
 ## Features
 `NpmEnv` can be `Clone` when the feature `nightly` is enabled. This only works under a nightly toolchain.
