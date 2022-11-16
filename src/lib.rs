@@ -36,11 +36,7 @@
 //!        .exec()?;
 //! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
-//!
-//! [`NpmEnv`] implements [`Clone`] while under a nightly toolchain
-//! when feature `nightly` is enabled.
 
-#![cfg_attr(feature = "nightly", feature(command_access))]
 use std::{
     ffi::OsStr,
     path::Path,
@@ -140,7 +136,6 @@ impl Default for NpmEnv {
     }
 }
 
-#[cfg(feature = "nightly")]
 impl Clone for NpmEnv {
     fn clone(&self) -> Self {
         let mut cmd = Command::new(self.0.get_program());
@@ -157,7 +152,7 @@ impl NpmEnv {
         let env = match node_env {
             NodeEnv::Development => "development",
             NodeEnv::Production => "production",
-            NodeEnv::Custom(c) => &c,
+            NodeEnv::Custom(c) => c,
         };
 
         self.with_env(NODE_ENV, env)

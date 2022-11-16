@@ -10,15 +10,14 @@ A library to run `npm` commands from your Rust build script.
 [Documentation](https://docs.rs/npm_rs)
 
 This library will aid you in executing `npm` commands when building your crate/bin,
-removing the burden on having to manually do so or by using a tool other than **Cargo**.
+removing the burden of having to manually do so or by using a tool other than **Cargo**.
 
 <!-- cargo-sync-readme start -->
 
-This crate provides an abstraction over [`Command`] to use `npm`
+This crate provides an abstraction over `Command` to use `npm`
 in a simple and easy package with fluent API.
 
-`npm_rs` exposes [`NpmEnv`] to configure the `npm` execution enviroment and
-[`Npm`] to use said enviroment to execute `npm` commands.
+`npm_rs` exposes `NpmEnv` to configure the `npm` execution enviroment and `Npm` to use said enviroment to execute `npm` commands.
 
 # Examples
 ## Manual `NODE_ENV` setup
@@ -50,25 +49,7 @@ let exit_status = NpmEnv::default()
        .run("build")
        .exec()?;
 ```
-
-[`NpmEnv`] implements [`Clone`] while under a nightly toolchain
-when feature `nightly` is enabled.
-
 <!-- cargo-sync-readme end -->
-
-# Features
-`NpmEnv` can be `Clone` when the feature `nightly` is enabled. This only works under a nightly toolchain.
-```toml
-# Cargo.toml
-
-[build.dependencies]
-npm_rs = { version = "*", features = ["nightly"] }
-```
-
-# Stability
-Since this is a small library, I would like it to have all the needed features and to be usable before commiting to a **v1.0.0**.
-
-Contributions are welcome!
 
 # License
 `npm_rs` is either distributed under **MIT** or **Apache-2.0** license. Choose as you please.
